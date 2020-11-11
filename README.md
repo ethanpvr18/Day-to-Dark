@@ -22,10 +22,10 @@ This project will be accomplished one step at a time by many people doing the be
 and a always listening GUI command line simalar to the EOS Command Line
 4. Develop a way of viewing all Cues at once either in a List or Timeline
 5. Develop the editing capabilty one feature at a time to the Audio Playback Module
-    ---
+
 6. Develop more built-in modules
 7. Develop the ability to create modules inside the application
-    ---
+
 8. Develop the Client-Server System 
         NOTE:  To Be Discussed.
 9. Develop the 3D Environment Preview / Magic Sheet 
