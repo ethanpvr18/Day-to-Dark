@@ -16,19 +16,19 @@ TFX also known as Theatre Effects, is a Next Generation Theatre Free and Open So
 
 This project will be accomplished one step at a time by many people doing the best they can do with their limited time.  The outline for this follows:
 
-1. Develop a Modular GUI that starts with only one module, the Audio Playback Module
-2. Develop a way to save a list of Audio Playback Cues into a JSON-formatted file
-3. Develop a way to create Audio Playback Cues quickly and easily both through a GUI Button, 
+1a. Develop a Modular GUI that starts with only one module, the Audio Playback Module
+1b. Develop a way to create Audio Playback Cues quickly and easily both through a GUI Button, 
 and a always listening GUI command line simalar to the ETC EOS Command Line
-4. Develop a way of viewing all Cues at once either in a List or Timeline
-5. Develop the editing capabilty one feature at a time to the Audio Playback Module
+2. Develop a way to save a list of Audio Playback Cues into a JSON-formatted file
+3. Develop a way of viewing all Cues at once either in a List or Timeline
+4. Develop the editing capabilty one feature at a time to the Audio Playback Module
 
-6. Develop more built-in modules
-7. Develop the ability to create modules inside the application
+5. Develop more built-in modules
+6. Develop the ability to create modules inside the application
 
-8. Develop the Client-Server System 
+7. Develop the Client-Server System 
         NOTE:  To Be Discussed.
-9. Develop the 3D Environment Preview / Magic Sheet 
+8. Develop the 3D Environment Preview / Magic Sheet 
         NOTE: To Be Discussed.
         
 NOTE: This the general main objectives to follow, see the [Project Board](https://github.com/ethanpvr18/TFX/projects/1) for detailed tasks.
