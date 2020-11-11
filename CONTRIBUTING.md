@@ -17,12 +17,14 @@ Please go to the *Projects* tab at the top of this repository to find the find t
 
 To contribute please follow these steps to make sure you don't write over someone else's code on submit incorrect code.
 
-1. Clone the repository to your local machine by running this command:
+1. Fork this repository.
 
-        $ git clone https://github.com/ethanpvr18/TFX.git
+2. Clone that forked repository to your local machine by running this command:
+
+        $ git clone https://github.com/your-username/TFX.git
         $ cd TFX
 
-2. Create a branch to hold your changes and start making changes. Don't work in the `main` branch!  Please name branch your version of what follows!
+3. Create a branch to hold your changes and start making changes. Don't work in the `main` branch!  Please name branch your version of what follows!
 
         $ git checkout -b my-username_my-feature-or-fix
 
@@ -37,7 +39,7 @@ To contribute please follow these steps to make sure you don't write over someon
 
         $ git push -u origin my-username_my-feature-or-fix
 
-6. Finally, go to https://github.com/ethanpvr18/TFX/branches and click *"Create Pull Request"* to send your changes for review.
+6. Finally, go to the webpage version of your forked repository and click *"Create Pull Request"* to send your changes for review.
 
 ## What can I do if I find a bug in the code?
 
