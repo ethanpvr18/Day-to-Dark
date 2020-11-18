@@ -1,0 +1,14 @@
+<TABLE_DATA>
+    <HEADERS>
+        <COLUMN columnId="1" name="Number" width="50"/>
+        <COLUMN columnId="2" name="Name" width="200"/>
+        <COLUMN columnId="3" name="Target" width="200"/>
+    </HEADERS>
+    <DATA>
+        <ITEM Number="1" Name="Untitled" Target="/"/>
+        <ITEM Number="2" Name="Untitled" Target="/"/>
+        <ITEM Number="3" Name="Untitled" Target="/"/>
+        <ITEM Number="4" Name="Untitled" Target="/"/>
+        <ITEM Number="5" Name="Untitled" Target="/"/>
+    </DATA>
+</TABLE_DATA>
