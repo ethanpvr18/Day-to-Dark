@@ -12,7 +12,7 @@ public:
 
         table.setColour (juce::ListBox::outlineColourId, juce::Colours::grey);      
         table.setOutlineThickness (1);
-
+        
         if (columnList != nullptr)
         {
             forEachXmlChildElement (*columnList, columnXml)
@@ -26,7 +26,7 @@ public:
                                              0);
             }
         }
-        
+                        
         table.getHeader().setSortColumnId (1, true);                               
 
         table.setMultipleSelectionEnabled (true);                                   
@@ -37,7 +37,7 @@ public:
         return numRows;
     }
 
-    void paintRowBackground (juce::Graphics& g, int rowNumber, bool rowIsSelected) override
+    void paintRowBackground (juce::Graphics& g, int rowNumber, bool rowIsSelected)
     {
         auto alternateColour = getLookAndFeel().findColour(juce::ListBox::backgroundColourId)
                                                .interpolatedWith(getLookAndFeel()
@@ -189,8 +189,10 @@ private:
 
     void loadData()
     {
-        auto dir = juce::File::getCurrentWorkingDirectory();
-
+        //Fix: juce::File::getCurrentWorkingDirectory()
+        
+        juce::File dir = juce::File("../TFX");
+        
         int numTries = 0;
 
         while (! dir.getChildFile ("Resources").exists() && numTries++ < 15)
@@ -226,10 +228,10 @@ private:
 class MainComponent : public juce::Component
 {
 public:
-    MainComponent()
+    MainComponent() : juce::Component()
     {
         addAndMakeVisible(table);
-
+        
         setSize(1200, 600);
     }
 
@@ -244,7 +246,7 @@ public:
     }
 
 private:
-    TableComponent table;
+    TableComponent::Component table;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };
