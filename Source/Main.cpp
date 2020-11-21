@@ -9,7 +9,7 @@ class TFXApplication  : public juce::JUCEApplication
 {
 public:
     //Application Constructor
-    TFXApplication() {}
+    TFXApplication() = default;
 
     //To get Application Name
     const juce::String getApplicationName() override       { return "TFX"; }
@@ -19,7 +19,7 @@ public:
     //When started
     void initialise (const juce::String& commandLine) override
     {
-        mainWindow.reset (new MainWindow (getApplicationName()));
+        mainWindow.reset (new MainWindow (getApplicationName(), new MainComponent(), *this));
     }
 
     //When shutdown
@@ -34,18 +34,20 @@ public:
         quit();
     }
     
+private:
     class MainWindow    : public juce::DocumentWindow
     {
     public:
         //Main Window Constructor
-        MainWindow (juce::String name)
+        MainWindow (juce::String name, juce::Component* c, JUCEApplication& a)
             : DocumentWindow (name,
                               juce::Desktop::getInstance().getDefaultLookAndFeel()
                                                           .findColour (juce::ResizableWindow::backgroundColourId),
-                              DocumentWindow::allButtons)
+                              DocumentWindow::allButtons),
+            app (a)
         {
             setUsingNativeTitleBar (true);
-            setContentOwned (new MainComponent(), true);
+            setContentOwned (c, true);
 
         
             setResizable (true, true);
@@ -57,14 +59,15 @@ public:
         //Close Button Request
         void closeButtonPressed() override
         {
-            JUCEApplication::getInstance()->systemRequestedQuit();
+            app.systemRequestedQuit();
         }
 
     private:
+        JUCEApplication& app;
+    
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainWindow)
     };
 
-private:
     std::unique_ptr<MainWindow> mainWindow;
 };
 

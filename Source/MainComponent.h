@@ -37,7 +37,7 @@ public:
         return numRows;
     }
 
-    void paintRowBackground (juce::Graphics& g, int rowNumber, bool rowIsSelected)
+    void paintRowBackground (juce::Graphics& g, int rowNumber, int /*width*/, int /*height*/, bool rowIsSelected) override
     {
         auto alternateColour = getLookAndFeel().findColour(juce::ListBox::backgroundColourId)
                                                .interpolatedWith(getLookAndFeel()
@@ -64,6 +64,66 @@ public:
         g.fillRect (width - 1, 0, 1, height);                                                                               
     }
 
+    void sortOrderChanged (int newSortColumnId, bool isForwards) override
+    {
+        if (newSortColumnId != 0)
+        {
+            DataSorter sorter (getAttributeNameForColumnId (newSortColumnId), isForwards);
+            dataList->sortChildElements (sorter);
+
+            table.updateContent();
+        }
+    }
+
+    Component* refreshComponentForCell (int rowNumber, int columnId, bool /*isRowSelected*/,
+                                        Component* existingComponentToUpdate) override
+    {
+        if (columnId == 9)  // [8]
+        {
+            auto* selectionBox = static_cast<SelectionColumnCustomComponent*> (existingComponentToUpdate);
+
+            if (selectionBox == nullptr)
+                selectionBox = new SelectionColumnCustomComponent (*this);
+
+            selectionBox->setRowAndColumn (rowNumber, columnId);
+            return selectionBox;
+        }
+
+        if (columnId == 8)  // [9]
+        {
+            auto* textLabel = static_cast<EditableTextCustomComponent*> (existingComponentToUpdate);
+
+            if (textLabel == nullptr)
+                textLabel = new EditableTextCustomComponent (*this);
+
+            textLabel->setRowAndColumn (rowNumber, columnId);
+            return textLabel;
+        }
+
+        jassert (existingComponentToUpdate == nullptr);
+        return nullptr;     // [10]
+    }
+
+    int getColumnAutoSizeWidth (int columnId) override
+    {
+        if (columnId == 9)
+            return 50;
+
+        int widest = 32;
+
+        for (auto i = getNumRows(); --i >= 0;)
+        {
+            if (auto* rowElement = dataList->getChildElement (i))
+            {
+                auto text = rowElement->getStringAttribute (getAttributeNameForColumnId (columnId));
+
+                widest = juce::jmax (widest, font.getStringWidth (text));
+            }
+        }
+
+        return widest + 8;
+    }
+    
     int getSelection (const int rowNumber) const
     {
         return dataList->getChildElement (rowNumber)->getIntAttribute ("Select");
@@ -189,16 +249,7 @@ private:
 
     void loadData()
     {
-        //Fix: juce::File::getCurrentWorkingDirectory()
-        
-        juce::File dir = juce::File("../TFX");
-        
-        int numTries = 0;
-
-        while (! dir.getChildFile ("Resources").exists() && numTries++ < 15)
-            dir = dir.getParentDirectory();
-
-        auto tableFile = dir.getChildFile ("Resources").getChildFile ("TableData.xml");
+        juce::File tableFile = juce::File("../Resources/TableData.xml");
 
         if (tableFile.exists())
         {
@@ -230,19 +281,19 @@ class MainComponent : public juce::Component
 public:
     MainComponent() : juce::Component()
     {
-        addAndMakeVisible(table);
+        addAndMakeVisible (table);
         
-        setSize(1200, 600);
+        setSize (1200, 600);
     }
 
     void paint(juce::Graphics& g) override
     {
-        g.fillAll(getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
+        g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
     }
 
     void resized() override
     {
-        table.setBounds(getLocalBounds());
+        table.setBounds (getLocalBounds());
     }
 
 private:
