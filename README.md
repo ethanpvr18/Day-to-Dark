@@ -19,9 +19,9 @@ This project will be accomplished one step at a time by many people doing the be
 1a. Develop a Modular GUI that starts with only one module, the Audio Playback Module
 
 1b. Develop a way to create Audio Playback Cues quickly and easily both through a GUI Button, 
-and a always listening GUI command line simalar to the ETC EOS Command Line
+and a always listening GUI command line similar to the ETC EOS Command Line
 
-2. Develop a way to save a list of Audio Playback Cues into a JSON-formatted file
+2. Develop a way to save a list of Audio Playback Cues into a XML-formatted file
 
 3. Develop a way of viewing all Cues at once either in a List or Timeline
 

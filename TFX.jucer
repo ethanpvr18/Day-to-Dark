@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="CUmw1y" name="TFX" projectType="guiapp" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1">
+              addUsingNamespaceToJuceHeader="1" jucerFormatVersion="1">
   <MAINGROUP id="AvPWoi" name="TFX">
     <GROUP id="{9E960BA2-F6F5-5B60-9DDF-2050560307DC}" name="Source">
       <FILE id="XOInZi" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
