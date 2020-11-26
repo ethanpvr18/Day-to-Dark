@@ -5,9 +5,9 @@
 
 using namespace std;
 
-class TableComponent: public juce::Component, public juce::TableListBoxModel {
+class TableComponent: public juce::AudioAppComponent, public juce::TableListBoxModel {
 public:
-    TableComponent()
+    TableComponent() : state(Stopped)
     {
         addAndMakeVisible (table);
         
@@ -30,6 +30,79 @@ public:
                 
             }
         }
+        
+        formatManager.registerBasicFormats();
+
+        if (juce::RuntimePermissions::isRequired (juce::RuntimePermissions::recordAudio)
+            && ! juce::RuntimePermissions::isGranted (juce::RuntimePermissions::recordAudio))
+        {
+            juce::RuntimePermissions::request (juce::RuntimePermissions::recordAudio,
+                                               [&] (bool granted) { setAudioChannels (granted ? 2 : 0, 2); });
+        }
+        else
+        {
+            // Specify the number of input and output channels that we want to open
+            setAudioChannels (2, 2);
+        }
+    }
+    
+    ~TableComponent() override
+    {
+        // This shuts down the audio device and clears the audio source.
+        shutdownAudio();
+    }
+    
+    void prepareToPlay (int samplesPerBlockExpected, double sampleRate) override
+    {
+        transportSource.prepareToPlay (samplesPerBlockExpected, sampleRate);
+    }
+    
+    void getNextAudioBlock (const juce::AudioSourceChannelInfo& bufferToFill) override
+    {
+        if (readerSource.get() == nullptr)
+        {
+            bufferToFill.clearActiveBufferRegion();
+            return;
+        }
+
+        transportSource.getNextAudioBlock (bufferToFill);
+    }
+    
+    void releaseResources() override
+    {
+        transportSource.releaseResources();
+    }
+    
+//    void changeListenerCallback (juce::ChangeBroadcaster* source)
+//    {
+//        if (source == &transportSource)
+//        {
+//            if (transportSource.isPlaying())
+//                changeState (Playing);
+//            else
+//                changeState (Stopped);
+//        }
+//    }
+    
+    void returnKeyPressed (int currentSelectedRow) override
+    {
+        auto file = getAttributeFileForRowId(currentSelectedRow);
+        
+        auto* reader = formatManager.createReaderFor (file);
+        
+        if (reader != nullptr)
+        {
+            std::unique_ptr<juce::AudioFormatReaderSource> newSource (new juce::AudioFormatReaderSource (reader, true));
+            transportSource.setSource (newSource.get(), 0, nullptr, reader->sampleRate);
+            readerSource.reset (newSource.release());
+        }
+        
+        changeState (Starting);
+    }
+    
+    void deleteKeyPressed (int currentSelectedRow) override
+    {
+        changeState (Stopping);
     }
 
     int getNumRows() override
@@ -68,6 +141,45 @@ public:
         table.setBounds(getLocalBounds());
     }
 private:
+    enum TransportState
+    {
+        Stopped,
+        Starting,
+        Playing,
+        Stopping
+    };
+    
+    void changeState (TransportState newState)
+    {
+        if (state != newState)
+        {
+            state = newState;
+
+            switch (state)
+            {
+                case Stopped:
+                    transportSource.setPosition (0.0);
+                    break;
+
+                case Starting:
+                    transportSource.start();
+                    break;
+
+                case Playing:
+                    break;
+
+                case Stopping:
+                    transportSource.stop();
+                    break;
+            }
+        }
+    }
+    
+    juce::AudioFormatManager formatManager;
+    std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
+    juce::AudioTransportSource transportSource;
+    TransportState state;
+    
     juce::TableListBox table  { {}, this };
     juce::Font font           { 14.0f };
 
@@ -75,7 +187,7 @@ private:
     juce::XmlElement* columnList = nullptr;
     juce::XmlElement* dataList = nullptr;
     int numRows = 0;
-
+    
     void loadData()
     {
         //Change to your resources path for now, will fix
@@ -111,6 +223,16 @@ private:
 
         return {};
     }
+    
+    juce::String getAttributeFileForRowId (const int rowId) const
+    {
+        if (auto* rowElement = dataList->getChildElement(rowId))
+        {
+            auto file = rowElement->getStringAttribute (getAttributeNameForColumnId (3));
+            
+            return file;
+        }
+    }
 };
 
 class MainComponent : public juce::Component
@@ -125,8 +247,6 @@ public:
     
     void resized() override
     {
-        //0, 0, getWidth(), getHeight()
-        
         table.setBounds (getLocalBounds());
     }
 
