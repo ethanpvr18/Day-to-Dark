@@ -9,16 +9,16 @@ class TableComponent: public juce::Component, public juce::TableListBoxModel {
 public:
     TableComponent()
     {
+        addAndMakeVisible (table);
+        
         table.setModel(this);
         table.setColour (juce::ListBox::outlineColourId, juce::Colours::grey);
+        table.setOutlineThickness(1);
                 
         loadData();
 
         if (columnList != nullptr)
         {
-            
-            int i = 0;
-            
             forEachXmlChildElement (*columnList, columnXml)
             {
                 table.getHeader().addColumn (columnXml->getStringAttribute ("name"),
@@ -26,14 +26,10 @@ public:
                                              columnXml->getIntAttribute ("width"),
                                              columnXml->getIntAttribute ("width"),
                                              columnXml->getIntAttribute ("width"),
-                                             18,
-                                             i);
+                                             juce::TableHeaderComponent::ColumnPropertyFlags::notResizableOrSortable);
                 
-                i++;
             }
         }
-                                        
-        addAndMakeVisible (table);
     }
 
     int getNumRows() override
@@ -41,22 +37,15 @@ public:
         return numRows;
     }
 
-    void paintRowBackground (juce::Graphics& g, int rowNumber, int /*width*/, int /*height*/, bool rowIsSelected) override
+    void paintRowBackground (juce::Graphics& g, int rowNumber, int width, int height, bool rowIsSelected) override
     {
         auto alternateColour = getLookAndFeel().findColour(juce::ListBox::backgroundColourId)
                                                .interpolatedWith(getLookAndFeel()
                                                .findColour(juce::ListBox::textColourId), 0.03f);
-        for(int columnNum = 0; columnNum < 3; columnNum++){
-            if (rowIsSelected){
-                g.fillAll (juce::Colours::lightblue);
-                paintCell(g, rowNumber, columnNum, 200, 30, true);
-            }else if (rowNumber % 2){
-                g.fillAll (alternateColour);
-                paintCell(g, rowNumber, columnNum, 200, 30, false);
-            }else{
-                paintCell(g, rowNumber, columnNum, 200, 30, false);
-            }
-        }
+        if (rowIsSelected)
+            g.fillAll(juce::Colours::lightblue);
+        else if (rowNumber % 2)
+            g.fillAll(alternateColour);
     }
 
     void paintCell (juce::Graphics& g, int rowNumber, int columnId, int width, int height, bool rowIsSelected) override
@@ -92,6 +81,15 @@ private:
         //Change to your resources path for now, will fix
         juce::File tableFile = juce::File("/Users/ethan/TFX/Resources/TableData.xml");
 
+//        auto dir = juce::File::getCurrentWorkingDirectory();
+//
+//        int numTries = 0;
+//
+//        while (!dir.getChildFile("Resources").exists() && numTries++ < 15)
+//            dir = dir.getParentDirectory();
+//
+//        auto tableFile = dir.getChildFile("Resources").getChildFile("TableData.xml");
+        
         if (tableFile.exists())
         {
             data = juce::XmlDocument::parse (tableFile);
@@ -124,10 +122,12 @@ public:
         
         setSize (1200, 600);
     }
-
+    
     void resized() override
     {
-        table.setBounds (0, 0, getWidth(), getHeight());
+        //0, 0, getWidth(), getHeight()
+        
+        table.setBounds (getLocalBounds());
     }
 
 private:
