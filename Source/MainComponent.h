@@ -4,12 +4,11 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include "AudioComponent.h"
 #include <iostream>
 
 using namespace std;
 
-class TableComponent: public juce::AudioAppComponent, public juce::TableListBoxModel {
+class TableComponent: public juce::AudioAppComponent, public juce::TableListBoxModel, private KeyListener {
 public:
     
     
@@ -49,6 +48,9 @@ public:
         } else {
             setAudioChannels (2, 2);
         }
+        
+        setWantsKeyboardFocus(true);
+        addKeyListener(this);
     }
     
     //Deconstructor
@@ -83,7 +85,7 @@ public:
         newItem->setAttribute("Name", name);
         newItem->setAttribute("Target", filePath);
                 
-        data->XmlElement::writeTo(juce::File("/Users/ethan/TFX/Resources/TableData.xml"), XmlElement::TextFormat());
+        data->XmlElement::writeTo(juce::File(currentFile), XmlElement::TextFormat());
         
         numRows++;
         
@@ -91,24 +93,45 @@ public:
         repaint();
     }
     
-    //Subsection [b] -- Method to Play the selected Audio File by Highlighting a Row and pressing Enter/Return
-    void returnKeyPressed (int currentSelectedRow) override {
-        auto file = getAttributeFileForRowId(currentSelectedRow);
-        
-        auto* reader = formatManager.createReaderFor (file);
-        
-        if (reader != nullptr) {
-            std::unique_ptr<juce::AudioFormatReaderSource> newSource (new juce::AudioFormatReaderSource (reader, true));
-            transportSource.setSource (newSource.get(), 0, nullptr, reader->sampleRate);
-            readerSource.reset (newSource.release());
-        }
-        
-        changeState (Starting);
-    }
-    
     //Subsection [c] -- Method to Play the selected Audio File by Highlighting a Row and pressing Enter/Return
     void deleteKeyPressed (int currentSelectedRow) override {
-        changeState (Stopping);
+        XmlElement* existingItem = dataList->getChildElement(currentSelectedRow);
+        
+        dataList->removeChildElement(existingItem, true);
+        
+        data->XmlElement::writeTo(juce::File(currentFile), XmlElement::TextFormat());
+        
+        numRows--;
+        
+        table.updateContent();
+        repaint();
+    }
+    
+    bool keyPressed(const KeyPress &k, Component *c) override {
+        if( k.getKeyCode() == juce::KeyPress::spaceKey ) {
+            
+            auto file = getAttributeFileForRowId(rowNumSelected);
+            
+            auto* reader = formatManager.createReaderFor (file);
+            
+            if (reader != nullptr) {
+                std::unique_ptr<juce::AudioFormatReaderSource> newSource (new juce::AudioFormatReaderSource (reader, true));
+                transportSource.setSource (newSource.get(), 0, nullptr, reader->sampleRate);
+                readerSource.reset (newSource.release());
+            }
+            
+            changeState (Starting);
+            return true;
+
+        }
+        
+        if( k.getKeyCode() == juce::KeyPress::escapeKey ) {
+            
+            changeState (Stopping);
+            return true;
+        }
+            
+        return false;
     }
     //=======================================================================================================================================
 
@@ -132,10 +155,12 @@ public:
         auto alternateColour = getLookAndFeel().findColour(juce::ListBox::backgroundColourId)
                                                .interpolatedWith(getLookAndFeel()
                                                .findColour(juce::ListBox::textColourId), 0.03f);
-        if (rowIsSelected)
+        if (rowIsSelected){
             g.fillAll(juce::Colours::lightblue);
-        else if (rowNumber % 2)
+            rowNumSelected = rowNumber;
+        }else if (rowNumber % 2){
             g.fillAll(alternateColour);
+        }
     }
 
     //Subsection [c] -- Paints each cell, and enter's the data's text
@@ -231,6 +256,11 @@ private:
     juce::XmlElement* dataList = nullptr;
     int numRows = 0;
     int numCols = 0;
+    int rowNumSelected = 0;
+    
+    //Change to your resources path for now, will fix
+    juce::String currentFile = "/Users/ethan/TFX/Resources/TableData.xml";
+    
     //=======================================================================================================================================
     
     
@@ -239,8 +269,7 @@ private:
     //Section [7] -- Load Data Helper Methods
     void loadData()
     {
-        //Change to your resources path for now, will fix
-        juce::File tableFile = juce::File("/Users/ethan/TFX/Resources/TableData.xml");
+        juce::File tableFile = juce::File(currentFile);
         
         if (tableFile.exists())
         {
