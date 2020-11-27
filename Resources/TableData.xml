@@ -1,14 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
 <TABLE_DATA>
-    <HEADERS>
-        <COLUMN name="Number" columnId="1" width="200"/>
-        <COLUMN name="Name" columnId="2" width="200"/>
-        <COLUMN name="Target" columnId="3" width="200"/>
-    </HEADERS>
-    <DATA>
-        <ITEM Number="1" Name="Untitled" Target="/Users/ethan/water.wav"/>
-        <ITEM Number="2" Name="Untitled" Target="/Users/ethan/water.wav"/>
-        <ITEM Number="3" Name="Untitled" Target="/Users/ethan/water.wav"/>
-        <ITEM Number="4" Name="Untitled" Target="/Users/ethan/water.wav"/>
-        <ITEM Number="5" Name="Untitled" Target="/Users/ethan/water.wav"/>
-    </DATA>
+  <HEADERS>
+    <COLUMN name="Number" columnId="1" width="200"/>
+    <COLUMN name="Name" columnId="2" width="200"/>
+    <COLUMN name="Target" columnId="3" width="200"/>
+  </HEADERS>
+  <DATA>
+  </DATA>
 </TABLE_DATA>
