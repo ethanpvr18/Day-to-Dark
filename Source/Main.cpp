@@ -11,7 +11,7 @@ public:
     TFXApplication() = default;
 
     //To get Application Name
-    const juce::String getApplicationName() override       { return "TFX"; }
+    const juce::String getApplicationName() override       { return "Day to Dark"; }
     //To get Application Version
     const juce::String getApplicationVersion() override    { return "1.0.0"; }
     

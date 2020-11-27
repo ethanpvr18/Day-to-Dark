@@ -6,14 +6,5 @@
     <COLUMN name="Name" columnId="2" width="200"/>
     <COLUMN name="Target" columnId="3" width="200"/>
   </HEADERS>
-  <DATA>
-    <ITEM Number="0" Name="" Target=""/>
-    <ITEM Number="1" Name="" Target=""/>
-    <ITEM Number="2" Name="" Target=""/>
-    <ITEM Number="3" Name="" Target=""/>
-    <ITEM Number="4" Name="" Target=""/>
-    <ITEM Number="5" Name="" Target=""/>
-    <ITEM Number="6" Name="" Target=""/>
-    <ITEM Number="7" Name="" Target=""/>
-  </DATA>
+  <DATA/>
 </TABLE_DATA>
