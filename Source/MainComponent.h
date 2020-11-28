@@ -18,28 +18,33 @@ public:
     TableComponent() : state(Stopped)
     {
         //Subsection [a] -- Create Add Audio Cue Button and its Function
-        addAudioCueButton.onClick = [this] { addAudioCue(getNumRows(), "", ""); };
+        addAudioCueButton.onClick = [this] { addAudioCue(getNumRows()+1, "", ""); };
         addAndMakeVisible (addAudioCueButton);
+        addAndMakeVisible (addGroupButton);
+        addAndMakeVisible (addFadeButton);
+        addAndMakeVisible (addPlayCueButton);
+        addAndMakeVisible (addStopCueButton);
+        addAndMakeVisible (addPauseCueButton);
+        
+        addAndMakeVisible (number);
+        number.setTextToShowWhenEmpty("Enter Cue Number",juce::Colours::grey);
+        addAndMakeVisible (name);
+        name.setTextToShowWhenEmpty("Enter Cue Name",juce::Colours::grey);
+        addAndMakeVisible (target);
+        target.setTextToShowWhenEmpty("Enter Target File or Target Cue",juce::Colours::grey);
+        updateCueButton.onClick = [this] { updateCueParams(number.getText(), name.getText(), target.getText()); };
+        addAndMakeVisible (updateCueButton);
+        
+        addAndMakeVisible (newProject);
+        newProject.onClick = [this] { newProjectWorkspace(); };
+        addAndMakeVisible (openProject);
+        openProject.onClick = [this] { openProjectWorkspace(); };
 
         //Subsection [b] -- Create Table and Load Data
         addAndMakeVisible (table);
         table.setModel(this);
         table.setColour (juce::ListBox::outlineColourId, juce::Colours::grey);
         table.setOutlineThickness(1);
-        loadData();
-        if (columnList != nullptr){
-            forEachXmlChildElement (*columnList, columnXml){
-                table.getHeader().addColumn (columnXml->getStringAttribute ("name"),
-                                             columnXml->getIntAttribute ("columnId"),
-                                             columnXml->getIntAttribute ("width"),
-                                             columnXml->getIntAttribute ("width"),
-                                             columnXml->getIntAttribute ("width"),
-                                             juce::TableHeaderComponent::ColumnPropertyFlags::notResizableOrSortable);
-                
-                numCols++;
-                
-            }
-        }
 
         //Subsection [c] -- Get Necessary Formats and Permissions for Playing Audio
         formatManager.registerBasicFormats();
@@ -77,20 +82,129 @@ public:
     //=======================================================================================================================================
     //Section [3] -- User Input Helper Methods
     
+    void newProjectWorkspace(){
+        if(dirChooser.browseForDirectory()){
+            juce::String dir = dirChooser.getResult().getFullPathName();
+                        
+            XmlDocument file (juce::File(dir+"/Untitled.xml"));
+
+            XmlElement headTag (juce::String("TABLE_DATA"));
+            
+            XmlElement* headersTag = new XmlElement("HEADERS");
+            headTag.addChildElement(headersTag);
+
+            XmlElement* numColTag = new XmlElement("COLUMN");
+            headersTag->addChildElement(numColTag);
+            XmlElement* nameColTag = new XmlElement("COLUMN");
+            headersTag->addChildElement(nameColTag);
+            XmlElement* targetColTag = new XmlElement("COLUMN");
+            headersTag->addChildElement(targetColTag);
+
+            numColTag->setAttribute("name", "Number");
+            numColTag->setAttribute("columnId", "1");
+            numColTag->setAttribute("width", "200");
+
+            nameColTag->setAttribute("name", "Name");
+            nameColTag->setAttribute("columnId", "2");
+            nameColTag->setAttribute("width", "200");
+
+            targetColTag->setAttribute("name", "Target");
+            targetColTag->setAttribute("columnId", "3");
+            targetColTag->setAttribute("width", "200");
+
+            XmlElement* dataTag = new XmlElement("DATA");
+            headTag.addChildElement(dataTag);
+            
+            XmlElement* firstCue = new XmlElement("ITEM");
+            dataTag->addChildElement(firstCue);
+            
+            firstCue->setAttribute("Number", "0");
+            firstCue->setAttribute("Name", "");
+            firstCue->setAttribute("Target", "");
+            
+            headTag.XmlElement::writeTo(juce::File(dir+"/Untitled.xml"), XmlElement::TextFormat());
+            
+            setCurrentFile(dir+"/Untitled.xml");
+                        
+            if (headersTag != nullptr){
+                forEachXmlChildElement (*headersTag, columnXml){
+                    table.getHeader().addColumn (columnXml->getStringAttribute ("name"),
+                                                 columnXml->getIntAttribute ("columnId"),
+                                                 columnXml->getIntAttribute ("width"),
+                                                 columnXml->getIntAttribute ("width"),
+                                                 columnXml->getIntAttribute ("width"),
+                                                 juce::TableHeaderComponent::ColumnPropertyFlags::notResizableOrSortable);
+                    
+                    numCols++;
+                    
+                }
+            }
+            
+            table.updateContent();
+            repaint();
+        }
+    }
+    
+    void openProjectWorkspace(){
+        if(chooser.browseForFileToOpen(nullptr)){
+            juce::String file = chooser.getResult().getFullPathName();
+            
+            setCurrentFile(file);
+                        
+            loadData(currentFile);
+            
+            if (columnList != nullptr){
+                forEachXmlChildElement (*columnList, columnXml){
+                    table.getHeader().addColumn (columnXml->getStringAttribute ("name"),
+                                                 columnXml->getIntAttribute ("columnId"),
+                                                 columnXml->getIntAttribute ("width"),
+                                                 columnXml->getIntAttribute ("width"),
+                                                 columnXml->getIntAttribute ("width"),
+                                                 juce::TableHeaderComponent::ColumnPropertyFlags::notResizableOrSortable);
+                    
+                    numCols++;
+                    
+                }
+            }
+            
+            table.updateContent();
+            repaint();
+        }
+    }
+    
     //Subsection [a] -- Method to Add a Audio Cue to the GUI Table and the XML File
     void addAudioCue(int num, juce::String name, juce::String filePath) {
+        loadData(currentFile);
+        
         XmlElement* newItem = dataList->createNewChildElement("ITEM");
         
         newItem->setAttribute("Number", num);
         newItem->setAttribute("Name", name);
         newItem->setAttribute("Target", filePath);
                 
-        data->XmlElement::writeTo(juce::File(currentFile), XmlElement::TextFormat());
+        data->XmlElement::writeTo(currentFile, XmlElement::TextFormat());
         
         numRows++;
         
         table.updateContent();
         repaint();
+    }
+    
+    void updateCueParams(juce::String num, juce::String name, juce::String filePath){
+        XmlElement* cueToUpdate = dataList->getChildElement(rowNumSelected);
+        
+        cueToUpdate->setAttribute("Number", num);
+        cueToUpdate->setAttribute("Name", name);
+        cueToUpdate->setAttribute("Target", filePath);
+        
+        data->XmlElement::writeTo(currentFile, XmlElement::TextFormat());
+
+        table.updateContent();
+        repaint();
+        
+        this->number.clear();
+        this->name.clear();
+        this->target.clear();
     }
     
     //Subsection [c] -- Method to Play the selected Audio File by Highlighting a Row and pressing Enter/Return
@@ -148,6 +262,10 @@ public:
     int getNumCols() {
         return numCols;
     }
+    
+    void setCurrentFile(juce::String file){
+        currentFile = juce::File(file);
+    }
 
     //Subsection [b] -- Paints the Alternating Row Colors
     void paintRowBackground (juce::Graphics& g, int rowNumber, int width, int height, bool rowIsSelected) override
@@ -182,9 +300,23 @@ public:
     
     //Subsection [d] -- Sets Sizes, and Bounds
     void resized() override {
-        table.setBounds(0, 25, 1200, 575);
-        addAudioCueButton.setBounds(0, 0, 100, 25);
-
+        table.setBounds(0, 25, 1200, 450);
+        
+        newProject.setBounds(0, 0, 100, 25);
+        openProject.setBounds(100, 0, 100, 25);
+        
+        addAudioCueButton.setBounds(300, 0, 100, 25);
+        addGroupButton.setBounds(450, 0, 100, 25);
+        addFadeButton.setBounds(600, 0, 100, 25);
+        addPlayCueButton.setBounds(750, 0, 100, 25);
+        addStopCueButton.setBounds(850, 0, 100, 25);
+        addPauseCueButton.setBounds(950, 0, 100, 25);
+        
+        number.setBounds(25, 500, 250, 25);
+        name.setBounds(25, 525, 250, 25);
+        target.setBounds(25, 550, 250, 25);
+        
+        updateCueButton.setBounds(25, 575, 250, 25);
     }
     //=======================================================================================================================================
 
@@ -247,7 +379,19 @@ private:
     
     //Subsection [b] -- GUI Variables
     juce::TableListBox table  { {}, this };
+    juce::TextButton addGroupButton {"Group"};
     juce::TextButton addAudioCueButton {"Audio"};
+    juce::TextButton addFadeButton {"Fade"};
+    juce::TextButton addPlayCueButton {"Play"};
+    juce::TextButton addStopCueButton {"Stop"};
+    juce::TextButton addPauseCueButton {"Pause"};
+
+    juce::TextEditor number;
+    juce::TextEditor name;
+    juce::TextEditor target;
+    juce::TextButton updateCueButton {"Update Cue"};
+    juce::TextButton newProject {"New"};
+    juce::TextButton openProject {"Open"};
     juce::Font font           { 14.0f };
     
     //Subsection [c] -- Data Loading Variables
@@ -258,8 +402,11 @@ private:
     int numCols = 0;
     int rowNumSelected = 0;
     
+    FileChooser chooser {"Choose a Project to open ...", juce::File::getCurrentWorkingDirectory(), "", false, this};
+    FileChooser dirChooser {"Choose a Directory to start your new project ...", juce::File::getCurrentWorkingDirectory(), "", false, this};
+    
     //Change to your resources path for now, will fix
-    juce::String currentFile = "/Users/ethan/TFX/Resources/TableData.xml";
+    juce::File currentFile;
     
     //=======================================================================================================================================
     
@@ -267,13 +414,11 @@ private:
     
     //=======================================================================================================================================
     //Section [7] -- Load Data Helper Methods
-    void loadData()
+    void loadData(juce::File file)
     {
-        juce::File tableFile = juce::File(currentFile);
-        
-        if (tableFile.exists())
+        if (file.exists())
         {
-            data = juce::XmlDocument::parse (tableFile);
+            data = juce::XmlDocument::parse (file);
 
             dataList   = data->getChildByName ("DATA");
             columnList = data->getChildByName ("HEADERS");     
@@ -338,7 +483,7 @@ public:
     {
         addAndMakeVisible (table);
         
-        setSize (1200, 600);
+        setSize (1200, 625);
     }
     
     void resized() override

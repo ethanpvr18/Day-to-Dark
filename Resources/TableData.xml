@@ -6,5 +6,7 @@
     <COLUMN name="Name" columnId="2" width="200"/>
     <COLUMN name="Target" columnId="3" width="200"/>
   </HEADERS>
-  <DATA/>
+  <DATA>
+    <ITEM Number="0" Name="Water" Target="/Users/ethan/water.wav"/>
+  </DATA>
 </TABLE_DATA>
