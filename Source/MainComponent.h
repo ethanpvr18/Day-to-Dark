@@ -26,14 +26,11 @@ public:
         addAndMakeVisible (addStopCueButton);
         addAndMakeVisible (addPauseCueButton);
         
-        addAndMakeVisible (number);
         number.setTextToShowWhenEmpty("Enter Cue Number",juce::Colours::grey);
-        addAndMakeVisible (name);
         name.setTextToShowWhenEmpty("Enter Cue Name",juce::Colours::grey);
-        addAndMakeVisible (target);
         target.setTextToShowWhenEmpty("Enter Target File or Target Cue",juce::Colours::grey);
         updateCueButton.onClick = [this] { updateCueParams(number.getText(), name.getText(), target.getText()); };
-        addAndMakeVisible (updateCueButton);
+        searchForTargetButton.onClick = [this] { searchForTarget(); };
         
         if(currentFile.getFullPathName() == ""){
             addAudioCueButton.setEnabled(false);
@@ -199,6 +196,14 @@ public:
         }
     }
     
+    void searchForTarget(){
+        if(tarChooser.browseForFileToOpen(nullptr)){
+            juce::String file = tarChooser.getResult().getFullPathName();
+            
+            target.setText(file);
+        }
+    }
+    
     //Subsection [a] -- Method to Add a Audio Cue to the GUI Table and the XML File
     void addAudioCue(int num, juce::String name, juce::String filePath) {
         loadData(currentFile);
@@ -218,7 +223,7 @@ public:
     }
     
     void updateCueParams(juce::String num, juce::String name, juce::String filePath){
-        XmlElement* cueToUpdate = dataList->getChildElement(rowNumSelected);
+        XmlElement* cueToUpdate = dataList->getChildElement(rowNumSelected-1);
         
         cueToUpdate->setAttribute("Number", num);
         cueToUpdate->setAttribute("Name", name);
@@ -228,7 +233,7 @@ public:
 
         table.updateContent();
         repaint();
-        
+                
         this->number.clear();
         this->name.clear();
         this->target.clear();
@@ -236,8 +241,8 @@ public:
     
     //Subsection [c] -- Method to Play the selected Audio File by Highlighting a Row and pressing Enter/Return
     void deleteKeyPressed (int currentSelectedRow) override {
-        XmlElement* existingItem = dataList->getChildElement(currentSelectedRow);
-        
+        XmlElement* existingItem = dataList->getChildElement(rowNumSelected-1);
+
         dataList->removeChildElement(existingItem, true);
         
         data->XmlElement::writeTo(juce::File(currentFile), XmlElement::TextFormat());
@@ -251,7 +256,7 @@ public:
     bool keyPressed(const KeyPress &k, Component *c) override {
         if( k.getKeyCode() == juce::KeyPress::spaceKey ) {
             
-            auto file = getAttributeFileForRowId(rowNumSelected);
+            auto file = getAttributeFileForRowId(rowNumSelected-1);
             
             auto* reader = formatManager.createReaderFor (file);
             
@@ -262,6 +267,7 @@ public:
             }
             
             changeState (Starting);
+                        
             return true;
 
         }
@@ -302,9 +308,36 @@ public:
                                                .findColour(juce::ListBox::textColourId), 0.03f);
         if (rowIsSelected){
             g.fillAll(juce::Colours::lightblue);
-            rowNumSelected = rowNumber;
+            rowNumSelected = rowNumber+1;
         }else if (rowNumber % 2){
             g.fillAll(alternateColour);
+        }
+        
+        XmlElement* existingItem = dataList->getChildElement(rowNumber);
+                
+        if(rowNumSelected > 0){
+            addAndMakeVisible (number);
+            number.setText(existingItem->getAttributeValue(0), true);
+            number.setReadOnly(false);
+            addAndMakeVisible (name);
+            name.setText(existingItem->getAttributeValue(1), true);
+            name.setReadOnly(false);
+            addAndMakeVisible (target);
+            target.setText(existingItem->getAttributeValue(2), true);
+            target.setReadOnly(false);
+            addAndMakeVisible (updateCueButton);
+            addAndMakeVisible (searchForTargetButton);
+        } else {
+            this->removeChildComponent (&number);
+            number.setVisible (false);
+            this->removeChildComponent (&name);
+            name.setVisible (false);
+            this->removeChildComponent (&target);
+            target.setVisible (false);
+            this->removeChildComponent (&updateCueButton);
+            updateCueButton.setVisible(false);
+            this->removeChildComponent (&searchForTargetButton);
+            searchForTargetButton.setVisible(false);
         }
     }
 
@@ -327,7 +360,7 @@ public:
     
     //Subsection [d] -- Sets Sizes, and Bounds
     void resized() override {
-        table.setBounds(0, 25, 1200, 450);
+        table.setBounds(0, 25, getWidth(), getHeight()-175);
         
         newProject.setBounds(0, 0, 100, 25);
         openProject.setBounds(100, 0, 100, 25);
@@ -339,11 +372,13 @@ public:
         addStopCueButton.setBounds(850, 0, 100, 25);
         addPauseCueButton.setBounds(950, 0, 100, 25);
         
-        number.setBounds(25, 500, 250, 25);
-        name.setBounds(25, 525, 250, 25);
-        target.setBounds(25, 550, 250, 25);
+        number.setBounds(25, getHeight()-125, 250, 25);
+        name.setBounds(25, getHeight()-100, 250, 25);
+        target.setBounds(25, getHeight()-75, 250, 25);
         
-        updateCueButton.setBounds(25, 575, 250, 25);
+        updateCueButton.setBounds(25, getHeight()-50, 250, 25);
+        
+        searchForTargetButton.setBounds(275, getHeight()-75, 25, 25);
     }
     //=======================================================================================================================================
 
@@ -417,6 +452,7 @@ private:
     juce::TextEditor name;
     juce::TextEditor target;
     juce::TextButton updateCueButton {"Update Cue"};
+    juce::TextButton searchForTargetButton {"..."};
     juce::TextButton newProject {"New"};
     juce::TextButton openProject {"Open"};
     juce::Font font           { 14.0f };
@@ -431,6 +467,7 @@ private:
     
     FileChooser chooser {"Choose a Project to open ...", juce::File::getCurrentWorkingDirectory(), "", false, this};
     FileChooser dirChooser {"Choose a Directory to start your new project ...", juce::File::getCurrentWorkingDirectory(), "", false, this};
+    FileChooser tarChooser {"Choose a File for this Cue ...", juce::File::getCurrentWorkingDirectory(), "", false, this};
     
     //Change to your resources path for now, will fix
     juce::File currentFile = juce::File("");
