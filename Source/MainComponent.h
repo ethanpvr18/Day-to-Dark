@@ -35,6 +35,15 @@ public:
         updateCueButton.onClick = [this] { updateCueParams(number.getText(), name.getText(), target.getText()); };
         addAndMakeVisible (updateCueButton);
         
+        if(currentFile.getFullPathName() == ""){
+            addAudioCueButton.setEnabled(false);
+            addGroupButton.setEnabled(false);
+            addFadeButton.setEnabled(false);
+            addPlayCueButton.setEnabled(false);
+            addStopCueButton.setEnabled(false);
+            addPauseCueButton.setEnabled(false);
+        }
+        
         addAndMakeVisible (newProject);
         newProject.onClick = [this] { newProjectWorkspace(); };
         addAndMakeVisible (openProject);
@@ -142,6 +151,15 @@ public:
             
             table.updateContent();
             repaint();
+            
+            if(currentFile.getFullPathName() != ""){
+                addAudioCueButton.setEnabled(true);
+                addGroupButton.setEnabled(false);
+                addFadeButton.setEnabled(false);
+                addPlayCueButton.setEnabled(false);
+                addStopCueButton.setEnabled(false);
+                addPauseCueButton.setEnabled(false);
+            }
         }
     }
     
@@ -169,6 +187,15 @@ public:
             
             table.updateContent();
             repaint();
+            
+            if(currentFile.getFullPathName() != ""){
+                addAudioCueButton.setEnabled(true);
+                addGroupButton.setEnabled(false);
+                addFadeButton.setEnabled(false);
+                addPlayCueButton.setEnabled(false);
+                addStopCueButton.setEnabled(false);
+                addPauseCueButton.setEnabled(false);
+            }
         }
     }
     
@@ -406,7 +433,7 @@ private:
     FileChooser dirChooser {"Choose a Directory to start your new project ...", juce::File::getCurrentWorkingDirectory(), "", false, this};
     
     //Change to your resources path for now, will fix
-    juce::File currentFile;
+    juce::File currentFile = juce::File("");
     
     //=======================================================================================================================================
     

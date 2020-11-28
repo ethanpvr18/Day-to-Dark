@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="CUmw1y" name="Day to Dark" projectType="guiapp" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="1" jucerFormatVersion="1">
+              addUsingNamespaceToJuceHeader="1" jucerFormatVersion="1" companyName="Day to Dark">
   <MAINGROUP id="AvPWoi" name="Day to Dark">
     <GROUP id="{9E960BA2-F6F5-5B60-9DDF-2050560307DC}" name="Source">
       <FILE id="XOInZi" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
