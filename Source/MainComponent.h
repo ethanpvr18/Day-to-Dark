@@ -90,108 +90,230 @@ public:
     
     void newProjectWorkspace(){
         if(dirChooser.browseForDirectory()){
-            juce::String dir = dirChooser.getResult().getFullPathName();
+            if(filesOpen > 0){
+                dataList = nullptr;
+                columnList = nullptr;
+                table.getHeader().removeAllColumns();
+                table.setModel(nullptr);
+                filesOpen--;
+                table.updateContent();
+                repaint();
+                
+                table.setModel(this);
+            
+                juce::String dir = dirChooser.getResult().getFullPathName();
+                            
+                XmlDocument file (juce::File(dir+"/Untitled.xml"));
+
+                XmlElement headTag (juce::String("TABLE_DATA"));
+                
+                XmlElement* headersTag = new XmlElement("HEADERS");
+                headTag.addChildElement(headersTag);
+
+                XmlElement* numColTag = new XmlElement("COLUMN");
+                headersTag->addChildElement(numColTag);
+                XmlElement* nameColTag = new XmlElement("COLUMN");
+                headersTag->addChildElement(nameColTag);
+                XmlElement* targetColTag = new XmlElement("COLUMN");
+                headersTag->addChildElement(targetColTag);
+
+                numColTag->setAttribute("name", "Number");
+                numColTag->setAttribute("columnId", "1");
+                numColTag->setAttribute("width", "200");
+
+                nameColTag->setAttribute("name", "Name");
+                nameColTag->setAttribute("columnId", "2");
+                nameColTag->setAttribute("width", "200");
+
+                targetColTag->setAttribute("name", "Target");
+                targetColTag->setAttribute("columnId", "3");
+                targetColTag->setAttribute("width", "200");
+
+                XmlElement* dataTag = new XmlElement("DATA");
+                headTag.addChildElement(dataTag);
+                
+                headTag.XmlElement::writeTo(juce::File(dir+"/Untitled.xml"), XmlElement::TextFormat());
+                
+                setCurrentFile(dir+"/Untitled.xml");
+                            
+                if (headersTag != nullptr){
+                    forEachXmlChildElement (*headersTag, columnXml){
+                        table.getHeader().addColumn (columnXml->getStringAttribute ("name"),
+                                                     columnXml->getIntAttribute ("columnId"),
+                                                     columnXml->getIntAttribute ("width"),
+                                                     columnXml->getIntAttribute ("width"),
+                                                     columnXml->getIntAttribute ("width"),
+                                                     juce::TableHeaderComponent::ColumnPropertyFlags::notResizableOrSortable);
                         
-            XmlDocument file (juce::File(dir+"/Untitled.xml"));
-
-            XmlElement headTag (juce::String("TABLE_DATA"));
-            
-            XmlElement* headersTag = new XmlElement("HEADERS");
-            headTag.addChildElement(headersTag);
-
-            XmlElement* numColTag = new XmlElement("COLUMN");
-            headersTag->addChildElement(numColTag);
-            XmlElement* nameColTag = new XmlElement("COLUMN");
-            headersTag->addChildElement(nameColTag);
-            XmlElement* targetColTag = new XmlElement("COLUMN");
-            headersTag->addChildElement(targetColTag);
-
-            numColTag->setAttribute("name", "Number");
-            numColTag->setAttribute("columnId", "1");
-            numColTag->setAttribute("width", "200");
-
-            nameColTag->setAttribute("name", "Name");
-            nameColTag->setAttribute("columnId", "2");
-            nameColTag->setAttribute("width", "200");
-
-            targetColTag->setAttribute("name", "Target");
-            targetColTag->setAttribute("columnId", "3");
-            targetColTag->setAttribute("width", "200");
-
-            XmlElement* dataTag = new XmlElement("DATA");
-            headTag.addChildElement(dataTag);
-            
-            XmlElement* firstCue = new XmlElement("ITEM");
-            dataTag->addChildElement(firstCue);
-            
-            firstCue->setAttribute("Number", "0");
-            firstCue->setAttribute("Name", "");
-            firstCue->setAttribute("Target", "");
-            
-            headTag.XmlElement::writeTo(juce::File(dir+"/Untitled.xml"), XmlElement::TextFormat());
-            
-            setCurrentFile(dir+"/Untitled.xml");
+                        numCols++;
                         
-            if (headersTag != nullptr){
-                forEachXmlChildElement (*headersTag, columnXml){
-                    table.getHeader().addColumn (columnXml->getStringAttribute ("name"),
-                                                 columnXml->getIntAttribute ("columnId"),
-                                                 columnXml->getIntAttribute ("width"),
-                                                 columnXml->getIntAttribute ("width"),
-                                                 columnXml->getIntAttribute ("width"),
-                                                 juce::TableHeaderComponent::ColumnPropertyFlags::notResizableOrSortable);
-                    
-                    numCols++;
-                    
+                    }
                 }
-            }
-            
-            table.updateContent();
-            repaint();
-            
-            if(currentFile.getFullPathName() != ""){
-                addAudioCueButton.setEnabled(true);
-                addGroupButton.setEnabled(false);
-                addFadeButton.setEnabled(false);
-                addPlayCueButton.setEnabled(false);
-                addStopCueButton.setEnabled(false);
-                addPauseCueButton.setEnabled(false);
+                
+                loadData(dir+"/Untitled.xml");
+                
+                table.updateContent();
+                repaint();
+                
+                if(currentFile.getFullPathName() != ""){
+                    addAudioCueButton.setEnabled(true);
+                    addGroupButton.setEnabled(false);
+                    addFadeButton.setEnabled(false);
+                    addPlayCueButton.setEnabled(false);
+                    addStopCueButton.setEnabled(false);
+                    addPauseCueButton.setEnabled(false);
+                }
+                
+                filesOpen++;
+            } else {
+                juce::String dir = dirChooser.getResult().getFullPathName();
+                            
+                XmlDocument file (juce::File(dir+"/Untitled.xml"));
+
+                XmlElement headTag (juce::String("TABLE_DATA"));
+                
+                XmlElement* headersTag = new XmlElement("HEADERS");
+                headTag.addChildElement(headersTag);
+
+                XmlElement* numColTag = new XmlElement("COLUMN");
+                headersTag->addChildElement(numColTag);
+                XmlElement* nameColTag = new XmlElement("COLUMN");
+                headersTag->addChildElement(nameColTag);
+                XmlElement* targetColTag = new XmlElement("COLUMN");
+                headersTag->addChildElement(targetColTag);
+
+                numColTag->setAttribute("name", "Number");
+                numColTag->setAttribute("columnId", "1");
+                numColTag->setAttribute("width", "200");
+
+                nameColTag->setAttribute("name", "Name");
+                nameColTag->setAttribute("columnId", "2");
+                nameColTag->setAttribute("width", "200");
+
+                targetColTag->setAttribute("name", "Target");
+                targetColTag->setAttribute("columnId", "3");
+                targetColTag->setAttribute("width", "200");
+
+                XmlElement* dataTag = new XmlElement("DATA");
+                headTag.addChildElement(dataTag);
+                
+                headTag.XmlElement::writeTo(juce::File(dir+"/Untitled.xml"), XmlElement::TextFormat());
+                
+                setCurrentFile(dir+"/Untitled.xml");
+                            
+                if (headersTag != nullptr){
+                    forEachXmlChildElement (*headersTag, columnXml){
+                        table.getHeader().addColumn (columnXml->getStringAttribute ("name"),
+                                                     columnXml->getIntAttribute ("columnId"),
+                                                     columnXml->getIntAttribute ("width"),
+                                                     columnXml->getIntAttribute ("width"),
+                                                     columnXml->getIntAttribute ("width"),
+                                                     juce::TableHeaderComponent::ColumnPropertyFlags::notResizableOrSortable);
+                        
+                        numCols++;
+                        
+                    }
+                }
+                
+                loadData(dir+"/Untitled.xml");
+                
+                table.updateContent();
+                repaint();
+                
+                if(currentFile.getFullPathName() != ""){
+                    addAudioCueButton.setEnabled(true);
+                    addGroupButton.setEnabled(false);
+                    addFadeButton.setEnabled(false);
+                    addPlayCueButton.setEnabled(false);
+                    addStopCueButton.setEnabled(false);
+                    addPauseCueButton.setEnabled(false);
+                }
+                
+                filesOpen++;
             }
         }
     }
     
     void openProjectWorkspace(){
         if(chooser.browseForFileToOpen(nullptr)){
-            juce::String file = chooser.getResult().getFullPathName();
-            
-            setCurrentFile(file);
+            if(filesOpen > 0){
+                dataList = nullptr;
+                columnList = nullptr;
+                table.getHeader().removeAllColumns();
+                table.setModel(nullptr);
+                filesOpen--;
+                table.updateContent();
+                repaint();
+                
+                table.setModel(this);
+                
+                juce::String file = chooser.getResult().getFullPathName();
+                
+                setCurrentFile(file);
+                            
+                loadData(currentFile);
+                
+                if (columnList != nullptr){
+                    forEachXmlChildElement (*columnList, columnXml){
+                        table.getHeader().addColumn (columnXml->getStringAttribute ("name"),
+                                                     columnXml->getIntAttribute ("columnId"),
+                                                     columnXml->getIntAttribute ("width"),
+                                                     columnXml->getIntAttribute ("width"),
+                                                     columnXml->getIntAttribute ("width"),
+                                                     juce::TableHeaderComponent::ColumnPropertyFlags::notResizableOrSortable);
                         
-            loadData(currentFile);
-            
-            if (columnList != nullptr){
-                forEachXmlChildElement (*columnList, columnXml){
-                    table.getHeader().addColumn (columnXml->getStringAttribute ("name"),
-                                                 columnXml->getIntAttribute ("columnId"),
-                                                 columnXml->getIntAttribute ("width"),
-                                                 columnXml->getIntAttribute ("width"),
-                                                 columnXml->getIntAttribute ("width"),
-                                                 juce::TableHeaderComponent::ColumnPropertyFlags::notResizableOrSortable);
-                    
-                    numCols++;
-                    
+                        numCols++;
+                        
+                    }
                 }
-            }
-            
-            table.updateContent();
-            repaint();
-            
-            if(currentFile.getFullPathName() != ""){
-                addAudioCueButton.setEnabled(true);
-                addGroupButton.setEnabled(false);
-                addFadeButton.setEnabled(false);
-                addPlayCueButton.setEnabled(false);
-                addStopCueButton.setEnabled(false);
-                addPauseCueButton.setEnabled(false);
+                
+                table.updateContent();
+                repaint();
+                
+                if(currentFile.getFullPathName() != ""){
+                    addAudioCueButton.setEnabled(true);
+                    addGroupButton.setEnabled(false);
+                    addFadeButton.setEnabled(false);
+                    addPlayCueButton.setEnabled(false);
+                    addStopCueButton.setEnabled(false);
+                    addPauseCueButton.setEnabled(false);
+                }
+                
+                filesOpen++;
+            } else {
+                juce::String file = chooser.getResult().getFullPathName();
+                
+                setCurrentFile(file);
+                            
+                loadData(currentFile);
+                
+                if (columnList != nullptr){
+                    forEachXmlChildElement (*columnList, columnXml){
+                        table.getHeader().addColumn (columnXml->getStringAttribute ("name"),
+                                                     columnXml->getIntAttribute ("columnId"),
+                                                     columnXml->getIntAttribute ("width"),
+                                                     columnXml->getIntAttribute ("width"),
+                                                     columnXml->getIntAttribute ("width"),
+                                                     juce::TableHeaderComponent::ColumnPropertyFlags::notResizableOrSortable);
+                        
+                        numCols++;
+                        
+                    }
+                }
+                
+                table.updateContent();
+                repaint();
+                
+                if(currentFile.getFullPathName() != ""){
+                    addAudioCueButton.setEnabled(true);
+                    addGroupButton.setEnabled(false);
+                    addFadeButton.setEnabled(false);
+                    addPlayCueButton.setEnabled(false);
+                    addStopCueButton.setEnabled(false);
+                    addPauseCueButton.setEnabled(false);
+                }
+                
+                filesOpen++;
             }
         }
     }
@@ -313,18 +435,10 @@ public:
             g.fillAll(alternateColour);
         }
         
-        XmlElement* existingItem = dataList->getChildElement(rowNumber);
-                
         if(rowNumSelected > 0){
             addAndMakeVisible (number);
-            number.setText(existingItem->getAttributeValue(0), true);
-            number.setReadOnly(false);
             addAndMakeVisible (name);
-            name.setText(existingItem->getAttributeValue(1), true);
-            name.setReadOnly(false);
             addAndMakeVisible (target);
-            target.setText(existingItem->getAttributeValue(2), true);
-            target.setReadOnly(false);
             addAndMakeVisible (updateCueButton);
             addAndMakeVisible (searchForTargetButton);
         } else {
@@ -464,6 +578,7 @@ private:
     int numRows = 0;
     int numCols = 0;
     int rowNumSelected = 0;
+    int filesOpen = 0;
     
     FileChooser chooser {"Choose a Project to open ...", juce::File::getCurrentWorkingDirectory(), "", false, this};
     FileChooser dirChooser {"Choose a Directory to start your new project ...", juce::File::getCurrentWorkingDirectory(), "", false, this};
