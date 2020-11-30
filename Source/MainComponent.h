@@ -17,42 +17,48 @@ public:
     //Section [1] -- Constructor
     TableComponent() : state(Stopped)
     {
-        //Subsection [a] -- Create Add Audio Cue Button and its Function
+        //Subsection [a] -- Create 'Add Audio Cue' Button and its Function
         addAudioCueButton.onClick = [this] { addAudioCue(getNumRows()+1, "", ""); };
         addAndMakeVisible (addAudioCueButton);
-        addAndMakeVisible (addGroupButton);
-        addAndMakeVisible (addFadeButton);
-        addAndMakeVisible (addPlayCueButton);
-        addAndMakeVisible (addStopCueButton);
-        addAndMakeVisible (addPauseCueButton);
         
+//        addAndMakeVisible (addGroupButton);
+//        addAndMakeVisible (addFadeButton);
+//        addAndMakeVisible (addPlayCueButton);
+//        addAndMakeVisible (addStopCueButton);
+//        addAndMakeVisible (addPauseCueButton);
+        
+        //Subsection [b] -- Set Placeholder Text for Editing a Cue
         number.setTextToShowWhenEmpty("Enter Cue Number",juce::Colours::grey);
         name.setTextToShowWhenEmpty("Enter Cue Name",juce::Colours::grey);
         target.setTextToShowWhenEmpty("Enter Target File or Target Cue",juce::Colours::grey);
+        
+        //Subsection [c] -- Set the Function for the 'Update Cue' and 'Search for Target' Button
         updateCueButton.onClick = [this] { updateCueParams(number.getText(), name.getText(), target.getText()); };
         searchForTargetButton.onClick = [this] { searchForTarget(); };
         
+        //Subsection [e] -- Only enable Cue Buttons when File is loaded here
         if(currentFile.getFullPathName() == ""){
             addAudioCueButton.setEnabled(false);
-            addGroupButton.setEnabled(false);
-            addFadeButton.setEnabled(false);
-            addPlayCueButton.setEnabled(false);
-            addStopCueButton.setEnabled(false);
-            addPauseCueButton.setEnabled(false);
+//            addGroupButton.setEnabled(false);
+//            addFadeButton.setEnabled(false);
+//            addPlayCueButton.setEnabled(false);
+//            addStopCueButton.setEnabled(false);
+//            addPauseCueButton.setEnabled(false);
         }
         
+        //Subsection [f] -- Create 'New Project' and 'Open Project' Button and its Function
         addAndMakeVisible (newProject);
         newProject.onClick = [this] { newProjectWorkspace(); };
         addAndMakeVisible (openProject);
         openProject.onClick = [this] { openProjectWorkspace(); };
 
-        //Subsection [b] -- Create Table and Load Data
+        //Subsection [g] -- Create Table
         addAndMakeVisible (table);
         table.setModel(this);
         table.setColour (juce::ListBox::outlineColourId, juce::Colours::grey);
         table.setOutlineThickness(1);
 
-        //Subsection [c] -- Get Necessary Formats and Permissions for Playing Audio
+        //Subsection [h] -- Get Necessary Formats and Permissions for Playing Audio
         formatManager.registerBasicFormats();
         if (juce::RuntimePermissions::isRequired (juce::RuntimePermissions::recordAudio) && ! juce::RuntimePermissions::isGranted (juce::RuntimePermissions::recordAudio)){
             juce::RuntimePermissions::request (juce::RuntimePermissions::recordAudio, [&] (bool granted) { setAudioChannels (granted ? 2 : 0, 2); });
@@ -60,6 +66,7 @@ public:
             setAudioChannels (2, 2);
         }
         
+        //Subsection [i] -- Create Keyboard Listener
         setWantsKeyboardFocus(true);
         addKeyListener(this);
     }
@@ -88,6 +95,7 @@ public:
     //=======================================================================================================================================
     //Section [3] -- User Input Helper Methods
     
+    //Subsection [a] -- Method to Start a Project
     void newProjectWorkspace(){
         if(dirChooser.browseForDirectory()){
             if(filesOpen > 0){
@@ -234,6 +242,7 @@ public:
         }
     }
     
+    //Subsection [b] -- Method to Open a Project
     void openProjectWorkspace(){
         if(chooser.browseForFileToOpen(nullptr)){
             if(filesOpen > 0){
@@ -318,6 +327,7 @@ public:
         }
     }
     
+    //Subsection [c] -- Method to Search for a Target File to add to a Cue
     void searchForTarget(){
         if(tarChooser.browseForFileToOpen(nullptr)){
             juce::String file = tarChooser.getResult().getFullPathName();
@@ -326,7 +336,7 @@ public:
         }
     }
     
-    //Subsection [a] -- Method to Add a Audio Cue to the GUI Table and the XML File
+    //Subsection [d] -- Method to Add a Audio Cue to the GUI Table and the XML File
     void addAudioCue(int num, juce::String name, juce::String filePath) {
         loadData(currentFile);
         
@@ -344,6 +354,7 @@ public:
         repaint();
     }
     
+    //Subsection [e] -- Method to Update Cue
     void updateCueParams(juce::String num, juce::String name, juce::String filePath){
         XmlElement* cueToUpdate = dataList->getChildElement(rowNumSelected-1);
         
@@ -361,7 +372,7 @@ public:
         this->target.clear();
     }
     
-    //Subsection [c] -- Method to Play the selected Audio File by Highlighting a Row and pressing Enter/Return
+    //Subsection [f] -- Method to Delete Cue when selected and pressed
     void deleteKeyPressed (int currentSelectedRow) override {
         XmlElement* existingItem = dataList->getChildElement(rowNumSelected-1);
 
@@ -376,6 +387,7 @@ public:
     }
     
     bool keyPressed(const KeyPress &k, Component *c) override {
+        //Subsection [g] -- Method Part (a) to Play Cue when selected and pressed
         if( k.getKeyCode() == juce::KeyPress::spaceKey ) {
             
             auto file = getAttributeFileForRowId(rowNumSelected-1);
@@ -389,11 +401,16 @@ public:
             }
             
             changeState (Starting);
+            
+            file = "";
+            reader = nullptr;
+            
+            table.selectRow(rowNumSelected, false, true);
                         
             return true;
 
         }
-        
+        //Subsection [h] -- Method Part (a) to Play Cue when selected and pressed
         if( k.getKeyCode() == juce::KeyPress::escapeKey ) {
             
             changeState (Stopping);
@@ -414,15 +431,17 @@ public:
         return numRows;
     }
     
+    //Subsection [b] -- Get the Current Number of Columns
     int getNumCols() {
         return numCols;
     }
     
+    //Subsection [c] -- Sets the Current File Open
     void setCurrentFile(juce::String file){
         currentFile = juce::File(file);
     }
 
-    //Subsection [b] -- Paints the Alternating Row Colors
+    //Subsection [d] -- Paints the Alternating Row Colors
     void paintRowBackground (juce::Graphics& g, int rowNumber, int width, int height, bool rowIsSelected) override
     {
         auto alternateColour = getLookAndFeel().findColour(juce::ListBox::backgroundColourId)
@@ -435,27 +454,27 @@ public:
             g.fillAll(alternateColour);
         }
         
-        if(rowNumSelected > 0){
-            addAndMakeVisible (number);
-            addAndMakeVisible (name);
-            addAndMakeVisible (target);
-            addAndMakeVisible (updateCueButton);
-            addAndMakeVisible (searchForTargetButton);
-        } else {
-            this->removeChildComponent (&number);
-            number.setVisible (false);
-            this->removeChildComponent (&name);
-            name.setVisible (false);
-            this->removeChildComponent (&target);
-            target.setVisible (false);
-            this->removeChildComponent (&updateCueButton);
-            updateCueButton.setVisible(false);
-            this->removeChildComponent (&searchForTargetButton);
-            searchForTargetButton.setVisible(false);
-        }
+//        if(rowNumSelected > 0){
+//            addAndMakeVisible (number);
+//            addAndMakeVisible (name);
+//            addAndMakeVisible (target);
+//            addAndMakeVisible (updateCueButton);
+//            addAndMakeVisible (searchForTargetButton);
+//        } else {
+//            this->removeChildComponent (&number);
+//            number.setVisible (false);
+//            this->removeChildComponent (&name);
+//            name.setVisible (false);
+//            this->removeChildComponent (&target);
+//            target.setVisible (false);
+//            this->removeChildComponent (&updateCueButton);
+//            updateCueButton.setVisible(false);
+//            this->removeChildComponent (&searchForTargetButton);
+//            searchForTargetButton.setVisible(false);
+//        }
     }
 
-    //Subsection [c] -- Paints each cell, and enter's the data's text
+    //Subsection [e] -- Paints each cell, and enter's the data's text
     void paintCell (juce::Graphics& g, int rowNumber, int columnId, int width, int height, bool rowIsSelected) override
     {
         g.setColour (rowIsSelected ? juce::Colours::darkblue : getLookAndFeel().findColour (juce::ListBox::textColourId));
@@ -472,7 +491,7 @@ public:
         g.fillRect (width - 1, 0, 1, height);
     }
     
-    //Subsection [d] -- Sets Sizes, and Bounds
+    //Subsection [f] -- Sets Sizes, and Bounds
     void resized() override {
         table.setBounds(0, 25, getWidth(), getHeight()-175);
         
@@ -584,7 +603,6 @@ private:
     FileChooser dirChooser {"Choose a Directory to start your new project ...", juce::File::getCurrentWorkingDirectory(), "", false, this};
     FileChooser tarChooser {"Choose a File for this Cue ...", juce::File::getCurrentWorkingDirectory(), "", false, this};
     
-    //Change to your resources path for now, will fix
     juce::File currentFile = juce::File("");
     
     //=======================================================================================================================================

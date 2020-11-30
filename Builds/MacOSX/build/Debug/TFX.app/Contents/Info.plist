@@ -8,10 +8,6 @@
 	<string>Day to Dark</string>
 	<key>CFBundleExecutable</key>
 	<string>TFX</string>
-	<key>CFBundleIconFile</key>
-	<string>AppIcon</string>
-	<key>CFBundleIconName</key>
-	<string>AppIcon</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.DaytoDark.DaytoDark</string>
 	<key>CFBundleName</key>
