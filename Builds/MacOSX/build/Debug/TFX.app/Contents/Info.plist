@@ -8,6 +8,10 @@
 	<string>Day to Dark</string>
 	<key>CFBundleExecutable</key>
 	<string>TFX</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon-2</string>
+	<key>CFBundleIconName</key>
+	<string>AppIcon-2</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.DaytoDark.DaytoDark</string>
 	<key>CFBundleName</key>
@@ -40,6 +44,8 @@
 	<string>1220</string>
 	<key>DTXcodeBuild</key>
 	<string>12B45b</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.entertainment</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>10.11</string>
 	<key>NSHighResolutionCapable</key>

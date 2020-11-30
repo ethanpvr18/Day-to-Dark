@@ -454,24 +454,24 @@ public:
             g.fillAll(alternateColour);
         }
         
-//        if(rowNumSelected > 0){
-//            addAndMakeVisible (number);
-//            addAndMakeVisible (name);
-//            addAndMakeVisible (target);
-//            addAndMakeVisible (updateCueButton);
-//            addAndMakeVisible (searchForTargetButton);
-//        } else {
-//            this->removeChildComponent (&number);
-//            number.setVisible (false);
-//            this->removeChildComponent (&name);
-//            name.setVisible (false);
-//            this->removeChildComponent (&target);
-//            target.setVisible (false);
-//            this->removeChildComponent (&updateCueButton);
-//            updateCueButton.setVisible(false);
-//            this->removeChildComponent (&searchForTargetButton);
-//            searchForTargetButton.setVisible(false);
-//        }
+        if(rowNumSelected > 0){
+            addAndMakeVisible (number);
+            addAndMakeVisible (name);
+            addAndMakeVisible (target);
+            addAndMakeVisible (updateCueButton);
+            addAndMakeVisible (searchForTargetButton);
+        } else {
+            this->removeChildComponent (&number);
+            number.setVisible (false);
+            this->removeChildComponent (&name);
+            name.setVisible (false);
+            this->removeChildComponent (&target);
+            target.setVisible (false);
+            this->removeChildComponent (&updateCueButton);
+            updateCueButton.setVisible(false);
+            this->removeChildComponent (&searchForTargetButton);
+            searchForTargetButton.setVisible(false);
+        }
     }
 
     //Subsection [e] -- Paints each cell, and enter's the data's text

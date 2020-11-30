@@ -1,0 +1,1 @@
+/Users/ethan/Library/Developer/Xcode/DerivedData/Day_to_Dark-hktrfubkkdkktifmpoldxnombhzx/Build/Intermediates.noindex/ArchiveIntermediates/Day to Dark - App/InstallationBuildProductsLocation/Users/ethan/Applications/TFX.app
