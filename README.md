@@ -1,4 +1,4 @@
-# TFX - *Next Generation Theatre Software*
+# ***Day to Dark*** - *Next Generation Theatre Software*
 
 ## What is ***Day to Dark*** - *Next Generation Theatre Software* and it's goal?
 
