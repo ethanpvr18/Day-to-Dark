@@ -5,8 +5,10 @@
 
 #include <JuceHeader.h>
 #include <iostream>
+#include "TransportMixerAudioSource.cpp"
 
 using namespace std;
+using namespace juce;
 
 class TableComponent: public juce::AudioAppComponent, public juce::TableListBoxModel, private KeyListener {
 public:
@@ -15,7 +17,7 @@ public:
     
     //=======================================================================================================================================
     //Section [1] -- Constructor
-    TableComponent() : state(Stopped)
+    TableComponent()
     {
         //Subsection [a] -- Create 'Add Audio Cue' Button and its Function
         addAudioCueButton.onClick = [this] { addAudioCue(getNumRows()+1, "", ""); };
@@ -79,14 +81,20 @@ public:
     
     //=======================================================================================================================================
     //Section [2] -- Playing Audio Helper Methods
-    void prepareToPlay (int samplesPerBlockExpected, double sampleRate) override { transportSource.prepareToPlay (samplesPerBlockExpected, sampleRate); }
-    void releaseResources() override { transportSource.releaseResources(); }
+    void prepareToPlay (int samplesPerBlockExpected, double sampleRate) override {
+         mixer.prepareToPlay (samplesPerBlockExpected, sampleRate);
+    }
+    void releaseResources() override {
+        mixer.releaseResources();
+    }
     void getNextAudioBlock (const juce::AudioSourceChannelInfo& bufferToFill) override {
-        if (readerSource.get() == nullptr){
-            bufferToFill.clearActiveBufferRegion();
-            return;
+        if(rowNumSelected != 0){
+            if (readerSource.get() == nullptr){
+                bufferToFill.clearActiveBufferRegion();
+                return;
+            }
+            transportSource[rowNumSelected].getNextAudioBlock (bufferToFill);
         }
-        transportSource.getNextAudioBlock (bufferToFill);
     }
     //=======================================================================================================================================
     
@@ -396,11 +404,15 @@ public:
             
             if (reader != nullptr) {
                 std::unique_ptr<juce::AudioFormatReaderSource> newSource (new juce::AudioFormatReaderSource (reader, true));
-                transportSource.setSource (newSource.get(), 0, nullptr, reader->sampleRate);
+                                
+                transportSource[rowNumSelected].setSource (newSource.get(), 0, nullptr, reader->sampleRate);
+                                        
+                mixer.addInputSource(&transportSource[rowNumSelected], false);
+                
                 readerSource.reset (newSource.release());
             }
             
-            changeState (Starting);
+            transportSource[rowNumSelected].start();
             
             file = "";
             reader = nullptr;
@@ -413,7 +425,9 @@ public:
         //Subsection [h] -- Method Part (a) to Play Cue when selected and pressed
         if( k.getKeyCode() == juce::KeyPress::escapeKey ) {
             
-            changeState (Stopping);
+            transportSource[rowNumSelected].stop();
+            transportSource[rowNumSelected].setPosition (0.0);
+            
             return true;
         }
             
@@ -522,55 +536,13 @@ private:
     
     
     //=======================================================================================================================================
-    //Section [5] -- Private State Helper Methods
-    
-    //Subsection [a] -- Declare State Values
-    enum TransportState
-    {
-        Stopped,
-        Starting,
-        Playing,
-        Stopping
-    };
-    
-    //Subsection [b] -- Changes the Current State, and Starts Sound
-    void changeState (TransportState newState)
-    {
-        if (state != newState)
-        {
-            state = newState;
-
-            switch (state)
-            {
-                case Stopped:
-                    transportSource.setPosition (0.0);
-                    break;
-
-                case Starting:
-                    transportSource.start();
-                    break;
-
-                case Playing:
-                    break;
-
-                case Stopping:
-                    transportSource.stop();
-                    break;
-            }
-        }
-    }
-    //=======================================================================================================================================
-
-    
-    
-    //=======================================================================================================================================
-    //Section [6] - Private Variables
+    //Section [5] - Private Variables
     
     //Subsection [a] -- Audio Helper Variables
     juce::AudioFormatManager formatManager;
     std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
-    juce::AudioTransportSource transportSource;
-    TransportState state;
+    TransportMixerAudioSource mixer;
+    AudioTransportSource transportSource [1024];
     
     //Subsection [b] -- GUI Variables
     juce::TableListBox table  { {}, this };
@@ -610,7 +582,7 @@ private:
     
     
     //=======================================================================================================================================
-    //Section [7] -- Load Data Helper Methods
+    //Section [6] -- Load Data Helper Methods
     void loadData(juce::File file)
     {
         if (file.exists())
@@ -672,7 +644,7 @@ private:
 
 
 //=======================================================================================================================================
-//Section [8] -- Main Component Class with Sub-components to be run by the Main.cpp file
+//Section [7] -- Main Component Class with Sub-components to be run by the Main.cpp file
 class MainComponent : public juce::Component
 {
 public:
@@ -690,7 +662,10 @@ public:
 
 private:
     TableComponent table;
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };
 //======================================================================================================================================= 
 
 //=======================================================================================================================================
+

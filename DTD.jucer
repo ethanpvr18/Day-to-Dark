@@ -6,6 +6,8 @@
     <GROUP id="{9E960BA2-F6F5-5B60-9DDF-2050560307DC}" name="Source">
       <FILE id="XOInZi" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
       <FILE id="eLWJ8q" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
+      <FILE id="jXntwm" name="TransportMixerAudioSource.cpp" compile="1"
+            resource="0" file="Source/TransportMixerAudioSource.cpp"/>
     </GROUP>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1"/>

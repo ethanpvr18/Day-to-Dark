@@ -481,6 +481,9 @@
     <ClCompile Include="..\..\Source\Main.cpp">
       <Filter>Day to Dark\Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\TransportMixerAudioSource.cpp">
+      <Filter>Day to Dark\Source</Filter>
+    </ClCompile>
     <ClCompile Include="C:\JUCE\modules\juce_audio_basics\buffers\juce_AudioChannelSet.cpp">
       <Filter>JUCE Modules\juce_audio_basics\buffers</Filter>
     </ClCompile>
