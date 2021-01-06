@@ -2,7 +2,7 @@
 //File [1] - TFX App Start Code
  
 #include <JuceHeader.h>
-#include "MainComponent.h"
+#include "MainComponent.cpp"
 
 class TFXApplication  : public juce::JUCEApplication
 {
@@ -27,7 +27,7 @@ public:
         mainWindow = nullptr;
     }
     
-    //Quit Request
+    //When quit
     void systemRequestedQuit() override
     {
         quit();
@@ -72,5 +72,4 @@ private:
 
 //JUCE APPLICATION START
 START_JUCE_APPLICATION (TFXApplication)
-//=======================================================================================================================================
-
+//========================================================================================================================================

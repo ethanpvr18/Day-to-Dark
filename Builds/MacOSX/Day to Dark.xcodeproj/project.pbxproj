@@ -85,6 +85,10 @@
 			isa = PBXBuildFile;
 			fileRef = A05156AD035A6CE0A65E8740;
 		};
+		12166D2DD4B6D5C49E253F5A = {
+			isa = PBXBuildFile;
+			fileRef = E1AC8E62CF0E9310B3F70C93;
+		};
 		C296A1DD87184C777187103A = {
 			isa = PBXBuildFile;
 			fileRef = A4DB548570569860683694FE;
@@ -474,18 +478,18 @@
 			path = "../../../JUCE/modules/juce_gui_basics";
 			sourceTree = "SOURCE_ROOT";
 		};
-		DEFC8CC96BBE8AE5D3A49B45 = {
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.c.h;
-			name = MainComponent.h;
-			path = ../../Source/MainComponent.h;
-			sourceTree = "SOURCE_ROOT";
-		};
 		E12532A8BA70B9920EBCFE7B = {
 			isa = PBXFileReference;
 			lastKnownFileType = file;
 			name = "juce_core";
 			path = "../../../JUCE/modules/juce_core";
+			sourceTree = "SOURCE_ROOT";
+		};
+		E1AC8E62CF0E9310B3F70C93 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = MainComponent.cpp;
+			path = ../../Source/MainComponent.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
 		ED27DA4FD43A83862705AF00 = {
@@ -520,8 +524,8 @@
 			isa = PBXGroup;
 			children = (
 				ED27DA4FD43A83862705AF00,
-				DEFC8CC96BBE8AE5D3A49B45,
 				A05156AD035A6CE0A65E8740,
+				E1AC8E62CF0E9310B3F70C93,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -900,6 +904,7 @@
 			files = (
 				56D0E8B271207DD4629323A3,
 				9289CD5E9DCF30B1F3B02684,
+				12166D2DD4B6D5C49E253F5A,
 				C296A1DD87184C777187103A,
 				2CD628DC675DDD684455807B,
 				7855A5101EF1677E5B41EEE3,
