@@ -35,7 +35,7 @@ and a always listening GUI command line similar to the ETC EOS Command Line
         
 9. Develop the 3D Environment Preview / Magic Sheet 
         
-NOTE: This is the general main objectives to follow, see the [Project Board](https://github.com/ethanpvr18/TFX/projects/1) for detailed tasks.
+NOTE: This is the general main objectives to follow, see the [Project Board](https://github.com/ethanpvr18/Day-to-Dark/projects/1) for detailed tasks.
 
 ## How can I contribute?
 
