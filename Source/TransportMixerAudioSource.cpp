@@ -130,7 +130,33 @@ public:
             info.clearActiveBufferRegion();
         }
     }
+    
+    void start()
+    {
+        if ((! playing) && inputs[inputs.size()-1] != nullptr)
+        {
+            for(int i = 0; i < inputs.size(); i++){
+                inputs.getUnchecked(i)->start();
+            }
+            playing = true;
+        }
+    }
+    
+    void stop()
+    {
+        if (playing)
+        {
+            playing = false;
+
+            for(int i = 0; i < inputs.size(); i++){
+                inputs.getUnchecked(i)->stop();
+            }
+        }
+    }
+    
 private:
+    bool playing = false;
+        
     Array<AudioTransportSource*> inputs;
     BigInteger inputsToDelete;
     CriticalSection lock;

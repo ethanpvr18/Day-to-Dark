@@ -4,6 +4,9 @@
 #include <JuceHeader.h>
 #include <iostream>
 #include "TransportMixerAudioSource.cpp"
+#include <map>
+#include <string>
+#include <utility>
 
 using namespace std;
 using namespace juce;
@@ -91,7 +94,7 @@ public:
                 bufferToFill.clearActiveBufferRegion();
                 return;
             }
-                        
+            printf("~18~");
             mixer.getNextAudioBlock(bufferToFill);
         }
     }
@@ -106,13 +109,7 @@ public:
     void newProjectWorkspace(){
         if(dirChooser.browseForDirectory()){
             if(filesOpen > 0){
-                dataList = nullptr;
-                columnList = nullptr;
-                table.getHeader().removeAllColumns();
-                table.setModel(nullptr);
-                filesOpen--;
-                table.updateContent();
-                repaint();
+                resetAll();
                 
                 table.setModel(this);
             
@@ -123,6 +120,7 @@ public:
                 XmlElement headTag (juce::String("TABLE_DATA"));
                 
                 XmlElement* headersTag = new XmlElement("HEADERS");
+                                
                 headTag.addChildElement(headersTag);
 
                 XmlElement* numColTag = new XmlElement("COLUMN");
@@ -172,11 +170,11 @@ public:
                 
                 if(currentFile.getFullPathName() != ""){
                     addAudioCueButton.setEnabled(true);
-                    addGroupButton.setEnabled(false);
-                    addFadeButton.setEnabled(false);
-                    addPlayCueButton.setEnabled(false);
-                    addStopCueButton.setEnabled(false);
-                    addPauseCueButton.setEnabled(false);
+//                    addGroupButton.setEnabled(false);
+//                    addFadeButton.setEnabled(false);
+//                    addPlayCueButton.setEnabled(false);
+//                    addStopCueButton.setEnabled(false);
+//                    addPauseCueButton.setEnabled(false);
                 }
                 
                 filesOpen++;
@@ -237,11 +235,11 @@ public:
                 
                 if(currentFile.getFullPathName() != ""){
                     addAudioCueButton.setEnabled(true);
-                    addGroupButton.setEnabled(false);
-                    addFadeButton.setEnabled(false);
-                    addPlayCueButton.setEnabled(false);
-                    addStopCueButton.setEnabled(false);
-                    addPauseCueButton.setEnabled(false);
+//                    addGroupButton.setEnabled(false);
+//                    addFadeButton.setEnabled(false);
+//                    addPlayCueButton.setEnabled(false);
+//                    addStopCueButton.setEnabled(false);
+//                    addPauseCueButton.setEnabled(false);
                 }
                 
                 filesOpen++;
@@ -253,13 +251,7 @@ public:
     void openProjectWorkspace(){
         if(chooser.browseForFileToOpen(nullptr)){
             if(filesOpen > 0){
-                dataList = nullptr;
-                columnList = nullptr;
-                table.getHeader().removeAllColumns();
-                table.setModel(nullptr);
-                filesOpen--;
-                table.updateContent();
-                repaint();
+                resetAll();
                 
                 table.setModel(this);
                 
@@ -288,11 +280,11 @@ public:
                 
                 if(currentFile.getFullPathName() != ""){
                     addAudioCueButton.setEnabled(true);
-                    addGroupButton.setEnabled(false);
-                    addFadeButton.setEnabled(false);
-                    addPlayCueButton.setEnabled(false);
-                    addStopCueButton.setEnabled(false);
-                    addPauseCueButton.setEnabled(false);
+//                    addGroupButton.setEnabled(false);
+//                    addFadeButton.setEnabled(false);
+//                    addPlayCueButton.setEnabled(false);
+//                    addStopCueButton.setEnabled(false);
+//                    addPauseCueButton.setEnabled(false);
                 }
                 
                 filesOpen++;
@@ -322,11 +314,11 @@ public:
                 
                 if(currentFile.getFullPathName() != ""){
                     addAudioCueButton.setEnabled(true);
-                    addGroupButton.setEnabled(false);
-                    addFadeButton.setEnabled(false);
-                    addPlayCueButton.setEnabled(false);
-                    addStopCueButton.setEnabled(false);
-                    addPauseCueButton.setEnabled(false);
+//                    addGroupButton.setEnabled(false);
+//                    addFadeButton.setEnabled(false);
+//                    addPlayCueButton.setEnabled(false);
+//                    addStopCueButton.setEnabled(false);
+//                    addPauseCueButton.setEnabled(false);
                 }
                 
                 filesOpen++;
@@ -396,37 +388,47 @@ public:
     bool keyPressed(const KeyPress &k, Component *c) override {
         //Subsection [g] -- Method Part (a) to Play Cue when selected and pressed
         if( k.getKeyCode() == juce::KeyPress::spaceKey ) {
-            
+            printf("~1~");
             auto file = getAttributeFileForRowId(rowNumSelected-1);
-            
+            printf("~2~");
             auto* reader = formatManager.createReaderFor (file);
-            
+            printf("~3~");
             if (reader != nullptr) {
+                printf("~4~");
                 std::unique_ptr<juce::AudioFormatReaderSource> newSource (new juce::AudioFormatReaderSource (reader, true));
-            
-                transportSource[rowNumSelected].setSource (newSource.get(), 0, nullptr, reader->sampleRate);
-                                                        
-                mixer.addInputSource(&transportSource[rowNumSelected], false);
-                
+                printf("~5~");
+                AudioTransportSource* newCue = new AudioTransportSource();
+                printf("~6~");
+                newCue->setSource(newSource.get(), 0, nullptr, reader->sampleRate);
+                printf("~7~");
+                mixer.addInputSource(newCue, false);
+                printf("~8~");
                 readerSource.reset (newSource.release());
+                printf("~9~");
             }
-            
-            transportSource[rowNumSelected].start();
-            
+            printf("~10~");
+            if(isPlaying)
+                mixer.stop();
+            printf("~11~");
+            mixer.start();
+            printf("~12~");
             file = "";
+            printf("~13~");
             reader = nullptr;
-            
+            printf("~14~");
             table.selectRow(rowNumSelected, false, true);
-                        
+            printf("~15~");
+            isPlaying = true;
+            printf("~17~");
             return true;
-
         }
         //Subsection [h] -- Method Part (a) to Play Cue when selected and pressed
         if( k.getKeyCode() == juce::KeyPress::escapeKey ) {
-        
-            releaseResources();
-//            transportSource[rowNumSelected].setPosition (0.0);
-            
+            printf("~19~");
+            mixer.stop();
+            printf("~20~");
+            isPlaying = false;
+            printf("~21~");
             return true;
         }
             
@@ -536,14 +538,12 @@ private:
     
     //========================================
     //Section [5] - Private Variables
+    bool isPlaying = false;
     
-    //Subsection [a] -- Audio Helper Variables
     juce::AudioFormatManager formatManager;
     std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
     TransportMixerAudioSource mixer;
-    AudioTransportSource transportSource [1024];
     
-    //Subsection [b] -- GUI Variables
     juce::TableListBox table  { {}, this };
     juce::TextButton addGroupButton {"Group"};
     juce::TextButton addAudioCueButton {"Audio"};
@@ -561,7 +561,6 @@ private:
     juce::TextButton openProject {"Open"};
     juce::Font font           { 14.0f };
     
-    //Subsection [c] -- Data Loading Variables
     std::unique_ptr<juce::XmlElement> data;
     juce::XmlElement* columnList = nullptr;
     juce::XmlElement* dataList = nullptr;
@@ -594,7 +593,23 @@ private:
             numRows = dataList->getNumChildElements();
         }
     }
+    
+    void resetAll()
+    {
+        dataList = nullptr;
+        columnList = nullptr;
+        table.getHeader().removeAllColumns();
+        table.setModel(nullptr);
+        filesOpen--;
+        table.updateContent();
+        repaint();
+    }
 
+    void addBaseXML(XmlElement headTag, XmlElement* headersTag)
+    {
+        
+    }
+    
     juce::String getAttributeNameForColumnId (const int columnId) const
     {
         forEachXmlChildElement (*columnList, columnXml)
