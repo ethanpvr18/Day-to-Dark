@@ -1,17 +1,23 @@
 Contributing
 ============
 
-All Contributions to *"TFX - Next Generation Theatre Software"* are very much appreciated.  However, please follow this guide for contributing.
+All Contributions to *"Day to Dark - Next Generation Theatre Software"* are very much appreciated.  However, please follow this guide for contributing.
 
 ## Where can I find tasks to work on?
 
-Please go to the *Projects* tab at the top of this repository to find the find the project board, and follow these steps.
+Please go to the *Projects* tab at the top of this repository to find the find the project board, and drag your selected task to the In Progress section.
 
-1.  Pick a item from the Unassigned Tasks Section, and drag it to the In Progress section
+## How to setup your JUCE Development Environment?
 
-2.  Make sure to follow the steps below to start!
+1. Download JUCE at https://juce.com/get-juce/download
 
-3. Start!
+2. Follow the below instructions to get the Project's code
+
+3. Open the Juce Folder, where you should see the Projucer Application, open the application and choose the DTD.jucer file to open
+
+4. Set the path of the JUCE Modules with this video: https://youtu.be/X6jQizDJVmo
+
+5. Depending on your OS, Click on the top bar to open in a compiler.
 
 ## When I am ready, How do I contribute my code?
 
@@ -19,27 +25,23 @@ To contribute please follow these steps to make sure you don't write over someon
 
 1. Fork this repository.
 
-2. Clone that forked repository to your local machine by running this command:
+2. Clone the forked repository to your local machine by running this command:
 
-        $ git clone https://github.com/your-username/TFX.git
-        $ cd TFX
+        $ git clone https://github.com/your-username/Day-to-Dark.git
+        $ cd Day-to-Dark
 
-3. Create a branch to hold your changes and start making changes. Don't work in the `main` branch!  Please name branch your version of what follows!
+3. Work on this copy on your computer using Git to do the version control. When you're done editing, run the following to record your changes in Git:
 
-        $ git checkout -b my-username_my-feature-or-fix
-
-4. Work on this copy on your computer using Git to do the version control. When you're done editing, run the following to record your changes in Git:
-
-        $ git add modified_files
-        $ git commit
+        $ git add *
+        $ git commit -m "My message"
         
    NOTE: Do this each time you make a notable addition or change, before you finally 'git push' below.
 
-5. Push your changes to GitHub with:
+4. Push your changes to GitHub with:
 
         $ git push -u origin my-username_my-feature-or-fix
 
-6. Finally, go to the webpage version of your forked repository and click *"Create Pull Request"* to send your changes for review.
+5. Finally, go to the webpage version of your forked repository and click *"Create Pull Request"* to send your changes for review.
 
 ## What can I do if I find a bug in the code?
 
