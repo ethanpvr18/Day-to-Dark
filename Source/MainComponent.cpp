@@ -94,7 +94,6 @@ public:
                 bufferToFill.clearActiveBufferRegion();
                 return;
             }
-            printf("~18~");
             mixer.getNextAudioBlock(bufferToFill);
         }
     }
@@ -388,47 +387,28 @@ public:
     bool keyPressed(const KeyPress &k, Component *c) override {
         //Subsection [g] -- Method Part (a) to Play Cue when selected and pressed
         if( k.getKeyCode() == juce::KeyPress::spaceKey ) {
-            printf("~1~");
             auto file = getAttributeFileForRowId(rowNumSelected-1);
-            printf("~2~");
             auto* reader = formatManager.createReaderFor (file);
-            printf("~3~");
             if (reader != nullptr) {
-                printf("~4~");
                 std::unique_ptr<juce::AudioFormatReaderSource> newSource (new juce::AudioFormatReaderSource (reader, true));
-                printf("~5~");
                 AudioTransportSource* newCue = new AudioTransportSource();
-                printf("~6~");
                 newCue->setSource(newSource.get(), 0, nullptr, reader->sampleRate);
-                printf("~7~");
                 mixer.addInputSource(newCue, false);
-                printf("~8~");
                 readerSource.reset (newSource.release());
-                printf("~9~");
             }
-            printf("~10~");
             if(isPlaying)
                 mixer.stop();
-            printf("~11~");
             mixer.start();
-            printf("~12~");
             file = "";
-            printf("~13~");
             reader = nullptr;
-            printf("~14~");
             table.selectRow(rowNumSelected, false, true);
-            printf("~15~");
             isPlaying = true;
-            printf("~17~");
             return true;
         }
-        //Subsection [h] -- Method Part (a) to Play Cue when selected and pressed
+        //Subsection [h] -- Method Part (b) to Stop Cue when selected and pressed
         if( k.getKeyCode() == juce::KeyPress::escapeKey ) {
-            printf("~19~");
             mixer.stop();
-            printf("~20~");
             isPlaying = false;
-            printf("~21~");
             return true;
         }
             
