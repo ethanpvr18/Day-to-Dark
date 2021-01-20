@@ -3,7 +3,7 @@
 
 #include <JuceHeader.h>
 #include <iostream>
-#include "TransportMixerAudioSource.cpp"
+#include "InputCachingMixerAudioSource.h"
 #include <map>
 #include <string>
 #include <utility>
@@ -83,10 +83,14 @@ public:
     //========================================
     //Section [2] -- Playing Audio Helper Methods
     void prepareToPlay (int samplesPerBlockExpected, double sampleRate) override {
-         mixer.prepareToPlay (samplesPerBlockExpected, sampleRate);
+        for(int i = 0; i < inputs.size(); i++)
+            if(inputs[i] != NULL)
+                inputs[i]->prepareToPlay (samplesPerBlockExpected, sampleRate);
     }
     void releaseResources() override {
-        mixer.releaseResources();
+        for(int i = 0; i < inputs.size(); i++)
+            if(inputs[i] != NULL)
+                inputs[i]->releaseResources();
     }
     void getNextAudioBlock (const juce::AudioSourceChannelInfo& bufferToFill) override {
         if(rowNumSelected != 0){
@@ -94,7 +98,10 @@ public:
                 bufferToFill.clearActiveBufferRegion();
                 return;
             }
-            mixer.getNextAudioBlock(bufferToFill);
+            for(int i = 0; i < inputs.size(); i++)
+                if(inputs[i] != NULL)
+                    if(bufferToFill.buffer != NULL)
+                        inputs[i]->getNextAudioBlock(bufferToFill);
         }
     }
     //========================================
@@ -391,24 +398,18 @@ public:
             auto* reader = formatManager.createReaderFor (file);
             if (reader != nullptr) {
                 std::unique_ptr<juce::AudioFormatReaderSource> newSource (new juce::AudioFormatReaderSource (reader, true));
-                AudioTransportSource* newCue = new AudioTransportSource();
-                newCue->setSource(newSource.get(), 0, nullptr, reader->sampleRate);
-                mixer.addInputSource(newCue, false);
+                newCue.setSource(newSource.get(), 0, nullptr, reader->sampleRate);
+                inputs.add(newSource.get());
+                inputs.getLast()->prepareToPlay(1000, reader->sampleRate);
+                newCue.start();
                 readerSource.reset (newSource.release());
             }
-            if(isPlaying)
-                mixer.stop();
-            mixer.start();
-            file = "";
-            reader = nullptr;
             table.selectRow(rowNumSelected, false, true);
-            isPlaying = true;
             return true;
         }
         //Subsection [h] -- Method Part (b) to Stop Cue when selected and pressed
         if( k.getKeyCode() == juce::KeyPress::escapeKey ) {
-            mixer.stop();
-            isPlaying = false;
+            newCue.stop();
             return true;
         }
             
@@ -522,7 +523,9 @@ private:
     
     juce::AudioFormatManager formatManager;
     std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
-    TransportMixerAudioSource mixer;
+    InputCachingMixerAudioSource mixer;
+    AudioTransportSource newCue;
+    Array<AudioSource*> inputs;
     
     juce::TableListBox table  { {}, this };
     juce::TextButton addGroupButton {"Group"};
