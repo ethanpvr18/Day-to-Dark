@@ -2,7 +2,7 @@
 
 ## What is ***Day to Dark*** - *Next Generation Theatre Software* and it's goal?
 
-***Day to Dark*** is a Next Generation Theatre Free and Open Source Software Project developed with [JUCE](https://www.JUCE.com) and C/C++.  The goal of this project is to develop a application that Theatrical Technicians and Designers can rely on to run all departments of a production at the Local Small to Mid-Size Theatre level.  This application will include after much development the following:
+***Day to Dark*** is a Next Generation Theatre Open Source Software Project developed with [JUCE](https://www.JUCE.com) and C/C++.  The goal of this project is to develop an application that Theatrical Technicians and Designers can rely on to run all departments of a production at the Local Small to Mid-Size Theatre level.  This application will include after much development the following:
 
 - A Cross-Platform Nature that can work on Mac OSX, Linux OS, and Windows OS
 - A Collaborative Nature where theatrical designers and technicians can work on a single show file over a Local Area Network, with a Client-Server Style System, which will have redundancy in case one machine fails
