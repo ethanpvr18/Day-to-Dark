@@ -41,3 +41,7 @@ NOTE: This is the general main objectives to follow, see the [Project Board](htt
 
 Please follow the CONTRIBUTING.md document
 
+Bounty System for earning rewards for contributing.
+[Issue Hunt](https://issuehunt.io/r/ethanpvr18/Day-to-Dark)
+
+[Discord](https://discord.gg/T7Z66dU679)
